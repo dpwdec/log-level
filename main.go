@@ -17,7 +17,10 @@ type attribute struct {
 }
 
 func main() {
-	statWeighting := 6
+	charStats := map[stats.Stats]int {
+		stats.CONSTITUTION: 6,
+		stats.TOUGHNESS: 7,
+	}
 
 	// initialise attribute mappings
 	attributes := [2]attribute {
@@ -57,19 +60,23 @@ func main() {
 			// handle input
 			switch strings.ReplaceAll(input, "\n", "") {
 			case "u":
-				statWeighting++
+				for stat := stats.Stats(0); stat < stats.Limit; stat++ {
+					charStats[stat]++
+				}
 			case "d":
-				statWeighting--
+				for stat := stats.Stats(0); stat < stats.Limit; stat++ {
+					charStats[stat]--
+				}
 			default:
 				fmt.Println("Use \"u\" to incremement stat weighting up\nAnd \"d\" to incrememnt stat weighting down.")
 			}
 
-			// display weightings
-			for _, x := range attributes {
-				for stat := stats.Stats(0); stat < stats.Limit; stat++ {
-					m := x.mappings[stat](statWeighting)
-					fmt.Printf("%v\n", m)
+			for _, attr := range attributes {
+				attrAmount := 0
+				for stat, statMap := range attr.mappings {
+					attrAmount += statMap(charStats[stat])
 				}
+				fmt.Printf("%v: %v\n", attr.name, attrAmount)
 			}
 		}
 	}
